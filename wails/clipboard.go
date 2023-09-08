@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func main() {
+func TestMain() {
 	err := clipboard.Init()
 	if err != nil {
 		return
