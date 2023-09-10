@@ -12,6 +12,7 @@ func ClientRunner() {
 	if err != nil {
 		return
 	}
+	pasteConnection := NewPasteConnection(conn)
 	defer conn.Close()
 
 	err = clipboard.Init()
@@ -26,12 +27,11 @@ func ClientRunner() {
 
 	go func() {
 		for {
-			msg := make([]byte, 9999)
-			_, err := conn.Read(msg)
+			content, err := pasteConnection.Read()
 			if err != nil {
-				log.Fatalf("read error: %v", err)
+				return
 			}
-			connReadCh <- msg
+			connReadCh <- content
 		}
 	}()
 
@@ -43,10 +43,7 @@ func ClientRunner() {
 				continue
 			}
 			lastContent = content
-			_, err := conn.Write(content)
-			if err != nil {
-				return
-			}
+			pasteConnection.Send(content)
 		case content := <-connReadCh:
 			log.Printf("client received: %s\nlastContent: %s\n", string(content), string(lastContent))
 			if string(lastContent) == string(content) {

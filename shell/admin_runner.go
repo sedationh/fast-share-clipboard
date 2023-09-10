@@ -6,26 +6,24 @@ import (
 	"net"
 )
 
-func pasteConnectionMsgHandler(conn net.Conn) {
-	defer conn.Close()
+func pasteConnectionMsgHandler(pasteConnection *PasteConnection) {
+	defer pasteConnection.conn.Close()
 	for {
-		msgBytes := make([]byte, 9999)
-		_, err := conn.Read(msgBytes)
+		content, err := pasteConnection.Read()
 		if err != nil {
 			return
 		}
-		log.Println("admin received", string(msgBytes))
+		if err != nil {
+			return
+		}
+		log.Println("admin received", string(content))
 
 		// 向其他 pasteConnection 发送消息
 		for _, pasteConnection := range pasteConnectionList.connList {
 
 			log.Printf("admin send to %s", pasteConnection.id)
 
-			_, err := pasteConnection.conn.Write(msgBytes)
-
-			if err != nil {
-				log.Fatalf("admin write error: %v", err)
-			}
+			pasteConnection.Send(content)
 		}
 	}
 }
@@ -40,7 +38,7 @@ func pasteConnectionHandler(listener net.Listener) {
 		pasteConnectionList.add(pasteConnection)
 
 		// 处理 message
-		go pasteConnectionMsgHandler(conn)
+		go pasteConnectionMsgHandler(pasteConnection)
 	}
 }
 
