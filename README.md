@@ -1,5 +1,27 @@
 # 快速分享剪贴板
 
+## 如何使用
+
+```zsh
+➜ ./mac-64-fast-share-clipboard --help
+Usage of ./mac-64-fast-share-clipboard:
+  -h, --host string   主机，非 admin 角色需要指定 host (default "127.0.0.1")
+  -p, --port string   端口 (default "8899")
+  -r, --role string   角色 (default "admin")
+pflag: help requested
+
+
+# 一台主机先以 admin 的身份开启
+# A computer
+➜ ./mac-64-fast-share-clipboard
+admin 8899 127.0.0.1
+config main.Config{Role:"admin", Port:"8899", Host:"127.0.0.1"}
+2023/09/14 09:23:51 admin local host: 192.168.31.35
+
+# 另一台再进行链接，链接 192.168.31.35, -r 的参数可以是任意的，只要不是 admin 就好
+./mac-64-fast-share-clipboard -h 192.168.31.35 -r xxx
+```
+
 ## 设计思路
 
 管理端
